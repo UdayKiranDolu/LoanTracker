@@ -44,14 +44,25 @@ export const STATUS_CONFIG = {
   },
 };
 
+// export const API_ENDPOINTS = {
+//   LOANS: '/loans',
+//   LOAN_BY_ID: (id) => `/loans/${id}`,
+//   EXTEND_DUE_DATE: (id) => `/loans/${id}/extend`,
+//   UPDATE_INTEREST: (id) => `/loans/${id}/interest`,
+//   LOANS_DUE_SOON: '/loans/status/duesoon',
+//   LOANS_OVERDUE: '/loans/status/overdue',
+// };
+
+
 export const API_ENDPOINTS = {
   LOANS: '/loans',
   LOAN_BY_ID: (id) => `/loans/${id}`,
-  EXTEND_DUE_DATE: (id) => `/loans/${id}/extend`,
-  UPDATE_INTEREST: (id) => `/loans/${id}/interest`,
   LOANS_DUE_SOON: '/loans/status/duesoon',
   LOANS_OVERDUE: '/loans/status/overdue',
+  EXTEND_DUE_DATE: (id) => `/loans/${id}/extend`,
+  UPDATE_INTEREST: (id) => `/loans/${id}/interest`,
 };
+
 
 export const DATE_FORMATS = {
   DISPLAY: 'MMM dd, yyyy',
