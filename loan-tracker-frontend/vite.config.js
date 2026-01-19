@@ -8,4 +8,13 @@ export default defineConfig({
     css: {
     postcss: './postcss.config.js',
   },
+    build: {
+    outDir: 'dist',
+    sourcemap: false,
+  },
+  server: {
+    port: 5173,
+  },
+  // This is important for SPA routing
+  base: '/',
 })
