@@ -253,3 +253,137 @@ class EmailService {
 // Export singleton instance
 const emailService = new EmailService();
 module.exports = emailService;
+
+// Send verification email
+exports.sendVerificationEmail = async (email, name, verificationUrl) => {
+  const mailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: 'Verify Your Email - Loan Tracker',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #4F46E5; color: white; padding: 20px; text-align: center; }
+          .content { padding: 30px; background: #f9fafb; }
+          .button { display: inline-block; padding: 12px 24px; background: #4F46E5; 
+                    color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>📧 Verify Your Email</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${name},</p>
+            <p>Thank you for registering with Loan Tracker!</p>
+            <p>Please click the button below to verify your email address:</p>
+            <a href="${verificationUrl}" class="button">Verify Email</a>
+            <p>Or copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; color: #4F46E5;">${verificationUrl}</p>
+            <p><strong>This link will expire in 24 hours.</strong></p>
+            <p>If you didn't create an account, please ignore this email.</p>
+          </div>
+          <div class="footer">
+            <p>Loan Tracker - Manage your loans efficiently</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  };
+  
+  await transporter.sendMail(mailOptions);
+};
+
+// Send password reset email
+exports.sendPasswordResetEmail = async (email, name, resetUrl) => {
+  const mailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: 'Password Reset Request - Loan Tracker',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #DC2626; color: white; padding: 20px; text-align: center; }
+          .content { padding: 30px; background: #f9fafb; }
+          .button { display: inline-block; padding: 12px 24px; background: #DC2626; 
+                    color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔒 Password Reset</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${name},</p>
+            <p>We received a request to reset your password.</p>
+            <p>Click the button below to reset your password:</p>
+            <a href="${resetUrl}" class="button">Reset Password</a>
+            <p>Or copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; color: #DC2626;">${resetUrl}</p>
+            <p><strong>This link will expire in 10 minutes.</strong></p>
+            <p>If you didn't request a password reset, please ignore this email or contact support if you have concerns.</p>
+          </div>
+          <div class="footer">
+            <p>Loan Tracker - Manage your loans efficiently</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  };
+  
+  await transporter.sendMail(mailOptions);
+};
+
+// Send password changed confirmation
+exports.sendPasswordChangedEmail = async (email, name) => {
+  const mailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: 'Password Changed - Loan Tracker',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #10B981; color: white; padding: 20px; text-align: center; }
+          .content { padding: 30px; background: #f9fafb; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>✅ Password Changed</h1>
+          </div>
+          <div class="content">
+            <p>Hi ${name},</p>
+            <p>This is a confirmation that your password has been successfully changed.</p>
+            <p>If you didn't make this change, please contact support immediately.</p>
+          </div>
+          <div class="footer">
+            <p>Loan Tracker - Manage your loans efficiently</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  };
+  
+  await transporter.sendMail(mailOptions);
+};

@@ -1,6 +1,6 @@
 /**
- * Standardized API Response Utility
- * Ensures consistent response format across all endpoints
+ * API Response Utility
+ * Standardizes API responses across the application
  */
 
 class ApiResponse {
@@ -11,33 +11,41 @@ class ApiResponse {
     return res.status(statusCode).json({
       success: true,
       message,
+      data, // FIXED: Ensure data is always included
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  /**
+   * Error response
+   */
+  static error(res, message = 'Error occurred', statusCode = 500, errors = null) {
+    return res.status(statusCode).json({
+      success: false,
+      message,
+      errors,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  /**
+   * Paginated response
+   */
+  static paginated(res, data, pagination, message = 'Success', statusCode = 200) {
+    return res.status(statusCode).json({
+      success: true,
+      message,
       data,
-      timestamp: new Date().toISOString(),
+      pagination,
+      timestamp: new Date().toISOString()
     });
   }
 
   /**
    * Created response (201)
    */
-  static created(res, data = null, message = 'Resource created successfully') {
+  static created(res, data, message = 'Resource created successfully') {
     return this.success(res, data, message, 201);
-  }
-
-  /**
-   * Error response
-   */
-  static error(res, message = 'An error occurred', statusCode = 500, errors = null) {
-    const response = {
-      success: false,
-      message,
-      timestamp: new Date().toISOString(),
-    };
-
-    if (errors) {
-      response.errors = errors;
-    }
-
-    return res.status(statusCode).json(response);
   }
 
   /**
@@ -55,30 +63,24 @@ class ApiResponse {
   }
 
   /**
-   * Validation error response (422)
+   * Unauthorized response (401)
    */
-  static validationError(res, errors) {
-    return this.error(res, 'Validation failed', 422, errors);
+  static unauthorized(res, message = 'Unauthorized') {
+    return this.error(res, message, 401);
   }
 
   /**
-   * Paginated response
+   * Forbidden response (403)
    */
-  static paginated(res, data, pagination, message = 'Success') {
-    return res.status(200).json({
-      success: true,
-      message,
-      data,
-      pagination: {
-        currentPage: pagination.page,
-        totalPages: pagination.totalPages,
-        totalItems: pagination.totalItems,
-        itemsPerPage: pagination.limit,
-        hasNextPage: pagination.page < pagination.totalPages,
-        hasPrevPage: pagination.page > 1,
-      },
-      timestamp: new Date().toISOString(),
-    });
+  static forbidden(res, message = 'Forbidden') {
+    return this.error(res, message, 403);
+  }
+
+  /**
+   * Internal server error (500)
+   */
+  static serverError(res, message = 'Internal server error') {
+    return this.error(res, message, 500);
   }
 }
 

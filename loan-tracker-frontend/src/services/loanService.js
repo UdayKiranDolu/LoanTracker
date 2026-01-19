@@ -12,7 +12,7 @@ const loanService = {
    */
   getAll: async (params = {}) => {
     const response = await api.get(API_ENDPOINTS.LOANS, { params });
-    return response;
+    return response.data; // FIXED: Return response.data
   },
 
   /**
@@ -21,7 +21,7 @@ const loanService = {
    */
   getById: async (id) => {
     const response = await api.get(API_ENDPOINTS.LOAN_BY_ID(id));
-    return response;
+    return response.data; // FIXED: Return response.data
   },
 
   /**
@@ -30,7 +30,7 @@ const loanService = {
    */
   create: async (loanData) => {
     const response = await api.post(API_ENDPOINTS.LOANS, loanData);
-    return response;
+    return response.data; // FIXED: Return response.data
   },
 
   /**
@@ -40,7 +40,7 @@ const loanService = {
    */
   update: async (id, loanData) => {
     const response = await api.put(API_ENDPOINTS.LOAN_BY_ID(id), loanData);
-    return response;
+    return response.data; // FIXED: Return response.data
   },
 
   /**
@@ -49,35 +49,48 @@ const loanService = {
    */
   delete: async (id) => {
     const response = await api.delete(API_ENDPOINTS.LOAN_BY_ID(id));
-    return response;
+    return response.data; // FIXED: Return response.data
   },
 
   /**
    * Extend due date
    * @param {string} id - Loan ID
-   * @param {Object} data - { extendedDueDate }
+   * @param {Object} data - { extendedDueDate, notes }
    */
   extendDueDate: async (id, data) => {
     const response = await api.post(API_ENDPOINTS.EXTEND_DUE_DATE(id), data);
-    return response;
+    return response.data; // FIXED: Return response.data
   },
 
   /**
    * Update interest
    * @param {string} id - Loan ID
-   * @param {Object} data - { increasedInterest }
+   * @param {Object} data - { additionalInterest, notes }
    */
   updateInterest: async (id, data) => {
     const response = await api.post(API_ENDPOINTS.UPDATE_INTEREST(id), data);
-    return response;
+    return response.data; // FIXED: Return response.data
+  },
+
+  /**
+   * Mark loan as completed
+   * @param {string} id - Loan ID
+   * @param {string} notes - Completion notes
+   */
+  markCompleted: async (id, notes = '') => {
+    const response = await api.post(API_ENDPOINTS.MARK_COMPLETED(id), { notes });
+    return response.data; // FIXED: Return response.data
   },
 
   /**
    * Get loans due soon
+   * @param {number} days - Number of days (default: 2)
    */
-  getDueSoon: async () => {
-    const response = await api.get(API_ENDPOINTS.LOANS_DUE_SOON);
-    return response;
+  getDueSoon: async (days = 2) => {
+    const response = await api.get(API_ENDPOINTS.LOANS_DUE_SOON, { 
+      params: { days } 
+    });
+    return response.data; // FIXED: Return response.data
   },
 
   /**
@@ -85,8 +98,16 @@ const loanService = {
    */
   getOverdue: async () => {
     const response = await api.get(API_ENDPOINTS.LOANS_OVERDUE);
-    return response;
+    return response.data; // FIXED: Return response.data
   },
+
+  /**
+   * Get loan statistics
+   */
+  getStatistics: async () => {
+    const response = await api.get(API_ENDPOINTS.LOAN_STATISTICS);
+    return response.data; // FIXED: Return response.data
+  }
 };
 
 export default loanService;

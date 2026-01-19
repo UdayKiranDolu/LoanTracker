@@ -42,10 +42,13 @@ const useLoans = () => {
         sortOrder: params.sortOrder || filters.sortOrder,
       };
 
+      // FIXED: Response now comes as response.data from loanService
       const response = await loanService.getAll(queryParams);
 
-      if (response.success) {
-        setLoans(response.data);
+      if (response && response.success) {
+        // FIXED: Data is in response.data
+        setLoans(response.data || []);
+        
         if (response.pagination) {
           setPagination(response.pagination);
         }
@@ -65,57 +68,32 @@ const useLoans = () => {
   /**
    * Fetch single loan by ID
    */
-//   const fetchLoanById = useCallback(async (id) => {
-//     try {
-//       setLocalLoading(true);
-//       const response = await loanService.getById(id);
+  const fetchLoanById = useCallback(async (id) => {
+    try {
+      setLocalLoading(true);
+      
+      // FIXED: Response now comes as response.data from loanService
+      const response = await loanService.getById(id);
 
-//       if (response.success) {
-//         return response.data;
-//       }
-//       return null;
-//     } catch (error) {
-//       const errorMsg = classifyError(error);
-//       toast.error(errorMsg);
-//       return null;
-//     } finally {
-//       setLocalLoading(false);
-//     }
-//   }, []);
-
-/**
- * Fetch single loan by ID
- */
-const fetchLoanById = useCallback(async (id) => {
-  try {
-    setLocalLoading(true);
-    console.log('useLoans - Fetching loan by ID:', id); // DEBUG
-    
-    const response = await loanService.getById(id);
-    console.log('useLoans - API Response:', response); // DEBUG
-    
-    if (response && response.success && response.data) {
-      console.log('useLoans - Returning loan data:', response.data); // DEBUG
-      return response.data;
-    } else if (response && response.data) {
-      // Some APIs return data directly without success flag
-      console.log('useLoans - Returning direct data:', response.data); // DEBUG
-      return response.data;
-    } else {
-      console.error('useLoans - Invalid response format:', response); // DEBUG
-      toast.error('Invalid response from server');
+      if (response && response.success) {
+        // FIXED: Return the loan data from response.data
+        return response.data;
+      }
+      
+      // Handle case where response doesn't have success flag
+      if (response && response.data) {
+        return response.data;
+      }
+      
       return null;
+    } catch (error) {
+      const errorMsg = classifyError(error);
+      toast.error(errorMsg);
+      return null;
+    } finally {
+      setLocalLoading(false);
     }
-  } catch (error) {
-    console.error('useLoans - Error fetching loan:', error); // DEBUG
-    const errorMsg = classifyError(error);
-    toast.error(errorMsg);
-    return null;
-  } finally {
-    setLocalLoading(false);
-  }
-}, []);
-
+  }, []);
 
   /**
    * Create new loan
@@ -123,13 +101,16 @@ const fetchLoanById = useCallback(async (id) => {
   const createLoan = useCallback(async (loanData) => {
     try {
       setLocalLoading(true);
+      
+      // FIXED: Response structure updated
       const response = await loanService.create(loanData);
 
-      if (response.success) {
+      if (response && response.success) {
         addLoan(response.data);
-        toast.success('Loan created successfully');
+        toast.success(response.message || 'Loan created successfully');
         return response.data;
       }
+      
       return null;
     } catch (error) {
       const errorMsg = classifyError(error);
@@ -146,13 +127,16 @@ const fetchLoanById = useCallback(async (id) => {
   const updateExistingLoan = useCallback(async (id, loanData) => {
     try {
       setLocalLoading(true);
+      
+      // FIXED: Response structure updated
       const response = await loanService.update(id, loanData);
 
-      if (response.success) {
+      if (response && response.success) {
         updateLoan(response.data);
-        toast.success('Loan updated successfully');
+        toast.success(response.message || 'Loan updated successfully');
         return response.data;
       }
+      
       return null;
     } catch (error) {
       const errorMsg = classifyError(error);
@@ -169,13 +153,16 @@ const fetchLoanById = useCallback(async (id) => {
   const removeLoan = useCallback(async (id) => {
     try {
       setLocalLoading(true);
+      
+      // FIXED: Response structure updated
       const response = await loanService.delete(id);
 
-      if (response.success) {
+      if (response && response.success) {
         deleteLoan(id);
-        toast.success('Loan deleted successfully');
+        toast.success(response.message || 'Loan deleted successfully');
         return true;
       }
+      
       return false;
     } catch (error) {
       const errorMsg = classifyError(error);
@@ -192,16 +179,19 @@ const fetchLoanById = useCallback(async (id) => {
   const extendLoanDueDate = useCallback(async (id, extendedDueDate, notes) => {
     try {
       setLocalLoading(true);
+      
+      // FIXED: Response structure updated
       const response = await loanService.extendDueDate(id, {
         extendedDueDate,
         notes,
       });
 
-      if (response.success) {
+      if (response && response.success) {
         updateLoan(response.data);
-        toast.success('Due date extended successfully');
+        toast.success(response.message || 'Due date extended successfully');
         return response.data;
       }
+      
       return null;
     } catch (error) {
       const errorMsg = classifyError(error);
@@ -218,16 +208,45 @@ const fetchLoanById = useCallback(async (id) => {
   const updateLoanInterest = useCallback(async (id, additionalInterest, notes) => {
     try {
       setLocalLoading(true);
+      
+      // FIXED: Response structure updated
       const response = await loanService.updateInterest(id, {
         additionalInterest,
         notes,
       });
 
-      if (response.success) {
+      if (response && response.success) {
         updateLoan(response.data);
-        toast.success('Interest updated successfully');
+        toast.success(response.message || 'Interest updated successfully');
         return response.data;
       }
+      
+      return null;
+    } catch (error) {
+      const errorMsg = classifyError(error);
+      toast.error(errorMsg);
+      return null;
+    } finally {
+      setLocalLoading(false);
+    }
+  }, [updateLoan]);
+
+  /**
+   * Mark loan as completed
+   * ADDED: New method for marking loans as completed
+   */
+  const markLoanCompleted = useCallback(async (id, notes = '') => {
+    try {
+      setLocalLoading(true);
+      
+      const response = await loanService.markCompleted(id, notes);
+
+      if (response && response.success) {
+        updateLoan(response.data);
+        toast.success(response.message || 'Loan marked as completed');
+        return response.data;
+      }
+      
       return null;
     } catch (error) {
       const errorMsg = classifyError(error);
@@ -241,12 +260,20 @@ const fetchLoanById = useCallback(async (id) => {
   /**
    * Fetch loans due soon
    */
-  const fetchDueSoonLoans = useCallback(async () => {
+  const fetchDueSoonLoans = useCallback(async (days = 2) => {
     try {
-      const response = await loanService.getDueSoon();
-      if (response.success) {
+      // FIXED: Response structure updated
+      const response = await loanService.getDueSoon(days);
+      
+      if (response && response.success) {
+        return response.data || [];
+      }
+      
+      // Handle direct data response
+      if (response && Array.isArray(response.data)) {
         return response.data;
       }
+      
       return [];
     } catch (error) {
       console.error('Error fetching due soon loans:', error);
@@ -259,14 +286,46 @@ const fetchLoanById = useCallback(async (id) => {
    */
   const fetchOverdueLoans = useCallback(async () => {
     try {
+      // FIXED: Response structure updated
       const response = await loanService.getOverdue();
-      if (response.success) {
+      
+      if (response && response.success) {
+        return response.data || [];
+      }
+      
+      // Handle direct data response
+      if (response && Array.isArray(response.data)) {
         return response.data;
       }
+      
       return [];
     } catch (error) {
       console.error('Error fetching overdue loans:', error);
       return [];
+    }
+  }, []);
+
+  /**
+   * Fetch loan statistics
+   * ADDED: New method for fetching statistics
+   */
+  const fetchStatistics = useCallback(async () => {
+    try {
+      const response = await loanService.getStatistics();
+      
+      if (response && response.success) {
+        return response.data || {};
+      }
+      
+      // Handle direct data response
+      if (response && response.data) {
+        return response.data;
+      }
+      
+      return {};
+    } catch (error) {
+      console.error('Error fetching statistics:', error);
+      return {};
     }
   }, []);
 
@@ -280,8 +339,10 @@ const fetchLoanById = useCallback(async (id) => {
     deleteLoan: removeLoan,
     extendDueDate: extendLoanDueDate,
     updateInterest: updateLoanInterest,
+    markCompleted: markLoanCompleted, // ADDED: Export new method
     fetchDueSoonLoans,
     fetchOverdueLoans,
+    fetchStatistics, // ADDED: Export new method
   };
 };
 

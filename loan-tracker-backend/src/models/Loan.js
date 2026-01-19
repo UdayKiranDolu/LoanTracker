@@ -92,6 +92,19 @@ const loanSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+        // NEW: User Association
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Loan must belong to a user']
+    },
+    
+    // NEW: Organization/Multi-tenancy (optional for future)
+    organization: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Organization',
+      required: false
+    },
   },
   {
     timestamps: true,
@@ -105,6 +118,9 @@ loanSchema.index({ borrowerName: 'text' });
 loanSchema.index({ dueDate: 1 });
 loanSchema.index({ status: 1 });
 loanSchema.index({ isDeleted: 1 });
+// Add index for user queries
+loanSchema.index({ createdBy: 1 });
+loanSchema.index({ createdBy: 1, isDeleted: 1 });
 
 // Virtual: Effective due date
 loanSchema.virtual('effectiveDueDate').get(function () {
