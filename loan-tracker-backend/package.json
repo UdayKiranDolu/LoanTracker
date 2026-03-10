@@ -9,8 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "create-admin": "node scripts/createAdmin.js",
     "migrate-loans": "node scripts/migrateLoanOwnership.js",
-    "seed-loans": "node scripts/seedLoans.js"
-
+    "seed-loans": "node scripts/seedLoans.js",
+    
   },
   "keywords": [
     "loan",
@@ -38,7 +38,8 @@
     "validator": "^13.15.26"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.2",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=18.0.0"
